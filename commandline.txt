@@ -1,0 +1,5 @@
+MongoDB
+net start MongoDB //Run MongoDB
+
+Server
+npm run serve //Run server with nodemon
