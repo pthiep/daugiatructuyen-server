@@ -1,17 +1,18 @@
-var Products = require('../models/productModel');
+var productRespository = require('../repository/productRespository');
+var express = require('express');
+var router = express.Router();
 
-function topproductsetprice(res){
-    Products.find(function(err, products){
-        if (err) {
-            res.status(500).json(err);
-        } else {
-            res.json(products);
-        }
-    });
-}
+router.get('/', function (req, res) {
+    productRespository.loadAll()
+        .then(function (rows) {
+            console.log('OK');
+            res.json(rows);
+        })
+        .catch(function (err) {
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View error log on console');
+        });
+});
 
-module.exports = function(app) {
-    app.get('/api/topproductsetprice', function(req, res){
-        topproductsetprice(res);
-    });
-}
+module.exports = router;

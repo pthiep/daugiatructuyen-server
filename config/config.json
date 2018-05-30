@@ -1,7 +1,7 @@
 {
     "app-name": "daugiatructuyen",
-    "host": "mongodb://localhost:27017",
+    "host": "localhost",
     "database_name": "daugiatructuyen",
-    "username": "pthiep",
-    "password": "donttrustme"
+    "username": "root",
+    "password": ""
 }

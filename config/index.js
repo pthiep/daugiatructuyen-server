@@ -1,7 +1,16 @@
 var configValues = require('./config');
 
 module.exports = {
-    getDbConnectionString: function() {
-        return `${configValues.host}/${configValues.database_name}`;
+    getHost: function (){
+        return `${configValues.host}`;
+    },
+    getUser: function (){
+        return `${configValues.username}`
+    },
+    getPass: function (){
+        return `${configValues.password}`
+    },
+    getDatabase: function (){
+        return `${configValues.database_name}`
     }
 }
