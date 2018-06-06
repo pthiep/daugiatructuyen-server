@@ -26,7 +26,7 @@ exports.load = function(sql) {
     return d.promise;
 }
 
-exports.insert = function (sql) {
+exports.loadDetail = function (sql, arr) {
     var d = q.defer();
 
     var con = mysql.createConnection({
@@ -37,7 +37,7 @@ exports.insert = function (sql) {
     });
 
     con.connect();
-    con.query(sql, function (err, rows, fields) {
+    con.query(sql, arr, function (err, rows, fields) {
         if (err) {
             d.reject(err);
         }

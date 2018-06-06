@@ -1,11 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-var mysql = require('mysql');
-var cors = require('cors')
+var cors = require('cors');
 
-var config = require('./config');
 var productController = require('./api/controllers/productController');
+var userController = require('./api/controllers/userController');
 
 var app = express();
 var server = require('http').Server(app);
@@ -22,20 +21,21 @@ app.use(morgan("dev"));
 
 // API
 app.use('/products', productController);
+app.use('/users', userController);
 
 // Socket.IO
 var countdown = 1000;
   
 setInterval(function() {  
-  countdown--;
-  io.sockets.emit('timer', { countdown: countdown });
+	countdown--;
+	io.sockets.emit('timer', { countdown: countdown });
 }, 1000);
 
 io.sockets.on('connection', function (socket) {  
-  socket.on('reset', function (data) {
-    countdown = 1000;
-    io.sockets.emit('timer', { countdown: countdown });
-  });
+	socket.on('reset', function () {
+		countdown = 1000;
+		io.sockets.emit('timer', { countdown: countdown });
+	});
 });
 //
 
