@@ -15,7 +15,21 @@ router.get('/', function (req, res) {
         });
 });
 
-// Link get 3 top 5 product
+// Link get chi tiet product
+router.post('/productdetail', function (req, res) {
+    var arrProductDetail= new Array();
+	arrProductDetail.push(req.body.productid);
+	productRespository.getProductDetail(arrProductDetail)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 //top5BestBid
 router.get('/', function(req, res) {
     productRespository.top5bestbid()
@@ -132,5 +146,6 @@ router.delete('/:id', (req, res) => {
         res.json('error');
     }
 });
+
 
 module.exports = router;

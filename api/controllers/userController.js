@@ -41,6 +41,7 @@ router.post('/login', function (req, res) {
 				arrUser.push(rows[0].mathongtin);
 				userRespository.getUser(arrUser)
 					.then(function (rows) {
+						user.userid = rows[0].manguoidung;
 						user.username = rows[0].tennguoidung;
 						user.address = rows[0].diachi;
 
@@ -112,5 +113,20 @@ router.get('/secured', checkToken, function (req, res) {
     });
 });
 
+
+// like product
+router.post('/likeproduct', function (req, res) {
+	var arrLikeProduct = new Array();
+	arrLikeProduct.push(req.body.userid);
+	userRespository.getListLikeProduct(arrLikeProduct)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
 
 module.exports = router;

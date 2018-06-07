@@ -1,0 +1,17 @@
+user
+	GET
+		/ : get all
+		/login : 
+
+	POST
+		/ : ABC
+product
+	GET
+		/ : ABC
+	POST
+
+deal
+	GET
+		/ : ABC
+	POST
+		/ : ABC

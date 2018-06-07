@@ -14,3 +14,8 @@ exports.getUser = function(arr) {
 	var sql = 'select * from thongtinnguoidung where manguoidung = ?';
 	return db.loadDetail(sql, arr);	
 }
+
+exports.getListLikeProduct = function(arr) {
+	var sql = 'select * from sanphamyeuthich where manguoidung = ?';
+	return db.loadDetail(sql, arr);	
+}
