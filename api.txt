@@ -15,3 +15,13 @@ deal
 		/ : ABC
 	POST
 		/ : ABC
+/categories
+	GET
+		/ : lấy tat ca
+		/catedetail: lấy theo id
+
+	POST
+		/ :thêm danh mục
+		/id : thêm danh mục
+	DELETE
+		/delete/:id : xóa danh mục

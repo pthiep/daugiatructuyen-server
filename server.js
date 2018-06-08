@@ -6,6 +6,7 @@ var cors = require('cors');
 var productController = require('./api/controllers/productController');
 var userController = require('./api/controllers/userController');
 var dealController = require('./api/controllers/dealController');
+var cateController = require('./api/controllers/categoryController');
 
 var app = express();
 var server = require('http').Server(app);
@@ -29,7 +30,7 @@ server.listen(port, function () {
 app.use('/products', productController);
 app.use('/users', userController);
 app.use('/deals', dealController);
-
+app.use('/categories', cateController);
 /* app.listen(port, function () {
 	console.log('App listening on port: ' + port);
 });

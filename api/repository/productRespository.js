@@ -1,7 +1,7 @@
 var db = require('../mysql/mysql-db')
 
 exports.loadAll = function() {
-	var sql = 'select * from products';
+	var sql = 'select * from sanpham';
 	return db.load(sql);
 }
 
