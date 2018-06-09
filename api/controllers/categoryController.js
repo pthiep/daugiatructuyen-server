@@ -3,92 +3,93 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', (req, res) => {
-    categoryRespository.loadAll().then(rows => {
-        res.json(rows);
-    }).catch(err => {
-        console.log(err);
-        res.statusCode = 500;
-        res.end('View error log on console.');
-    });
+	categoryRespository.loadAll()
+		.then(function(rows) {
+			res.json(rows);
+			res.statusCode = 200;
+		})
+		.catch(err => {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console.');
+		});
 });
 
 //get by id
 router.post('/catedetail', (req, res) => {
-    if (req.body.cateid) {
-        var id = req.body.cateid;
-        if (isNaN(id)) {
-            res.statusCode = 400;
-            res.end();
-            return;
-        }
-        var arr = new Array();
-            arr.push(req.body.cateid); 
-        
-        console.log(arr);
+	if (req.body.cateid) {
+		var id = req.body.cateid;
+		if (isNaN(id)) {
+			res.statusCode = 400;
+			res.end();
+			return;
+		}
+		var arr = new Array();
+		arr.push(req.body.cateid);
 
-        categoryRespository.getCateDetail(arr)
-            .then(rows => {
-                if (rows.length > 0) {
-                    res.json(rows[0]);
-                } else {
-                    res.statusCode = 204;
-                    res.end();
+		categoryRespository.getCateDetail(arr)
+			.then(rows => {
+				if (rows.length > 0) {
+					res.json(rows[0]);
+				} else {
+					res.statusCode = 204;
+					res.end();
 
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                res.statusCode = 500;
-                res.json('error');
-            });
+				}
+			})
+			.catch(err => {
+				console.log(err);
+				res.statusCode = 500;
+				res.json('error');
+			});
 
-    } else {
-        res.statusCode = 400;
-        res.json('error');
-    }
+	} else {
+		res.statusCode = 400;
+		res.json('error');
+	}
 });
 
 router.post('/', (req, res) => {
-    categoryRespository.insert(req.body)
-        .then(insertId => {
-            var poco = {
-                madanhmuc: insertId,
-                tendanhmuc: req.body.tendanhmuc
-            };
-            res.statusCode = 201;
-            res.json(poco);
-        })
-        .catch(err => {
-            console.log(err);
-            res.statusCode = 500;
-            res.end();
+	categoryRespository.insert(req.body)
+		.then(insertId => {
+			var poco = {
+				madanhmuc: insertId,
+				tendanhmuc: req.body.tendanhmuc
+			};
+			res.statusCode = 201;
+			res.json(poco);
+		})
+		.catch(err => {
+			console.log(err);
+			res.statusCode = 500;
+			res.end();
 
-        });
+		});
 });
 
 router.delete('/:id', (req, res) => {
-    if (req.params.id) {
-        var id = req.params.id;
-        if (isNaN(id)) {
-            res.statusCode = 400;
-            res.end();
-            return;
-        }
+	if (req.params.id) {
+		var id = req.params.id;
+		if (isNaN(id)) {
+			res.statusCode = 400;
+			res.end();
+			return;
+		}
 
-        categoryRespository.delete(id).then(affectedRows => {
-            res.json({
-                affectedRows: affectedRows
-            });
+		categoryRespository.delete(id).then(affectedRows => {
+			res.json({
+				affectedRows: affectedRows
+			});
 
-        }).catch(err => {
-            console.log(err);
-            res.statusCode = 500;
-            res.json('error');
-        });
-    } else {
-        res.statusCode = 400;
-        res.json('error');
-    }
+		}).catch(err => {
+			console.log(err);
+			res.statusCode = 500;
+			res.json('error');
+		});
+	} else {
+		res.statusCode = 400;
+		res.json('error');
+	}
 });
 
 module.exports = router;
