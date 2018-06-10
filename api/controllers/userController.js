@@ -15,18 +15,33 @@ router.get('/', function (req, res) {
 		});
 });
 
+router.post('/checkuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.username);
+	arr.push(req.body.password);
+	userRespository.checkUser(arr)
+		.then(function (results) {
+			res.json(results);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 // update login
-router.post('/login', function(req, res){
+router.post('/login', function (req, res) {
 	var arrData = new Array();
 	arrData.push(req.body.status);
-	arrData.push(req.body.userid);	
+	arrData.push(req.body.userid);
 	userRespository.loginStatus(arrData)
-		.then(function(rows){
+		.then(function (rows) {
 			res.json({
 				msg: 'Cập nhật trạng thái đăng nhập'
 			});
 		})
-		.catch(function(err){
+		.catch(function (err) {
 			console.log(err);
 			res.statusCode = 500;
 			res.end('View error log on console');

@@ -20,7 +20,7 @@ router.post('/login', function (req, res) {
 			payload.userObj = user;
 
 			token = jwt.sign(payload, SECRET_KEY, {
-				expiresIn: 30
+				expiresIn: 7 * 24 * 60 * 60 * 1000
 			});
 			res.json({
 				access_token: token
@@ -64,6 +64,7 @@ router.get('/secured', checkToken, function (req, res) {
 		msg: 'Secured',
 		payload: req.tokenPayload
 	});
+	res.statusCode = 200;
 });
 
 module.exports = router;

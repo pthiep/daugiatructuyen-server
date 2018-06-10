@@ -6,14 +6,14 @@ var cookieParser = require('cookie-parser')
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 
+var timeController = require('./api/controllers/timeController');
 var jwtController = require('./api/controllers/jwtController');
 var productController = require('./api/controllers/productController');
 var userController = require('./api/controllers/userController');
 var dealController = require('./api/controllers/dealController');
 var cateController = require('./api/controllers/categoryController');
 
-var loginSocket = require('./socket/socket_login');
-var timeSocket = require('./socket/socket_time');
+var dealSocket = require('./socket/socket_deal');
 
 var config = require('./config/index');
 var options = {
@@ -41,10 +41,9 @@ var sessionMiddleware = session({
 	}
 });
 
-io.use(function(socket, next) {
-    sessionMiddleware(socket.request, socket.request.res, next);
+io.use(function (socket, next) {
+	sessionMiddleware(socket.request, socket.request.res, next);
 });
-
 app.set('trust proxy', 1)
 app.use(sessionMiddleware);
 app.use(cookieParser());
@@ -55,12 +54,13 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 server.listen(port, function () {
 	console.log('Server listening on port: ' + port);
 });
 // API
+app.use('/timenow', timeController);
 app.use('/jwt', jwtController);
 app.use('/products', productController);
 app.use('/users', userController);
@@ -69,10 +69,6 @@ app.use('/categories', cateController);
 
 // Socket.IO
 
-var userLogined = [];
-
 io.on('connection', function (socket) {
-	console.log("Connect IO:" + socket.id);
-	timeSocket.datetime(socket);
-	loginSocket.login(socket);
+	dealSocket.deal(io, socket);
 });
