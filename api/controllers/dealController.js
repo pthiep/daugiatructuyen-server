@@ -15,6 +15,19 @@ router.get('/', function (req, res) {
         });
 });
 
+// thoi gian deals
+router.post('/dealtime', function (req, res) {
+	dealRespository.getDealTime()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 // chi tiet deals
 router.post('/dealdetail', function (req, res) {
     var arrDealDetail= new Array();
@@ -96,4 +109,42 @@ router.post('/updatedealprice', function (req, res) {
 		});
 });
 
+//topBestBid
+router.get('/topbestbid', function(req, res) {
+    dealRespository.topBestBid()
+        .then(function (rows) {
+            res.json(rows);
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View err log on console');
+        });
+});
+
+//topBestPrice
+router.get('/topbestprice',function(req, res){
+    dealRespository.topBestPrice()
+        .then(function(rows){
+            res.json(rows);
+        })
+        .catch(function(err){
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View err log on console');
+        });
+});
+
+//top5Timeout
+router.get('/toptimeout',function(req, res){
+    dealRespository.topTimeOut()
+        .then(function(rows){
+            res.json(rows);
+        })
+        .catch(function(err){
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View err log on console');
+        });
+});
 module.exports = router;
