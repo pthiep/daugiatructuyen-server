@@ -30,6 +30,20 @@ router.post('/checkuser', function (req, res) {
 		});
 });
 
+router.post('/checkrulesale', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.getRuleSale(arr)
+		.then(function (results) {
+			res.json(results);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 // update login
 router.post('/login', function (req, res) {
 	var arrData = new Array();

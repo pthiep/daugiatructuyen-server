@@ -2,7 +2,7 @@ var dealRespository = require('../api/repository/dealRespository');
 
 module.exports = {
 	deal: function (io, socket) {
-		console.log('ID: ' + socket.id);
+		console.log('SocketDEALID: ' + socket.id);
 		socket.on('deal_pricesuccess', function (data) {
 			// console.log('Yeu cau cap nhat gia for all');
 			io.sockets.emit('update_dealdetail', '');
@@ -19,6 +19,13 @@ module.exports = {
 		socket.on('deal_updatehistory', function (data) {
 			// console.log('Yeu cau cap nhat gia for all');
 			io.sockets.emit('update_dealhistory', '');
+		});
+
+		socket.on('time_estartupdatetime', function (data) {
+			dealRespository.getDealTime()
+				.then(function (results) {
+					socket.emit('time_ostartupdatetime', results[0].thoigianhientai);
+				});			
 		});
 	}
 }

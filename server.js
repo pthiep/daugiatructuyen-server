@@ -5,6 +5,7 @@ var cors = require('cors');
 var cookieParser = require('cookie-parser')
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
+var bb = require('express-busboy');
 
 var timeController = require('./api/controllers/timeController');
 var jwtController = require('./api/controllers/jwtController');
@@ -30,7 +31,6 @@ var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
 var sessionStore = new MySQLStore(options);
-
 var sessionMiddleware = session({
 	key: 'TH',
 	secret: 'TH',
@@ -45,6 +45,7 @@ var sessionMiddleware = session({
 io.use(function (socket, next) {
 	sessionMiddleware(socket.request, socket.request.res, next);
 });
+
 app.set('trust proxy', 1)
 app.use(sessionMiddleware);
 app.use(cookieParser());
@@ -55,11 +56,18 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
+bb.extend(app, {
+	upload: true,
+	path: __dirname + '/public/img/_temp',
+	allowedPath: /./
+});
+
 // app.use(morgan("dev"));
 
 server.listen(port, function () {
 	console.log('Server listening on port: ' + port);
 });
+
 // API
 app.use('/timenow', timeController);
 app.use('/jwt', jwtController);
@@ -69,8 +77,7 @@ app.use('/deals', dealController);
 app.use('/categories', cateController);
 
 // Socket.IO
-
 io.on('connection', function (socket) {
-	homeSocket.time(socket);
+	homeSocket.time(io, socket);
 	dealSocket.deal(io, socket);
 });

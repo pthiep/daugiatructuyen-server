@@ -44,6 +44,13 @@ module.exports = {
 		var sql = 'select * from thongtinnguoidung where manguoidung = ?';
 		return db.loadDetail(sql, arr);
 	},
+
+	getRuleSale: function (arr) {
+		var sql = 'select manguoidung, quyenban, '
+				+ 'convert_tz(thoigianban,\'+00:00\',\'+07:00\') as thoigianban '
+				+ 'from nguoidung where manguoidung = ?';
+		return db.loadDetail(sql, arr);
+	},
 	
 	getListLikeProduct: function (arr) {
 		var sql = 'select * from sanphamyeuthich where manguoidung = ?';

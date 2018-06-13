@@ -1,18 +1,21 @@
 var dealRespository = require('../repository/dealRespository');
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
+var path = require('path');
+var rimraf = require('rimraf');
 
 // Link API "/deals"
 router.get('/', function (req, res) {
-    productRespository.loadAll()
-        .then(function (rows) {
-            res.json(rows);
-        })
-        .catch(function (err) {
-            console.log(err);
-            res.statusCode = 500;
-            res.end('View error log on console');
-        });
+	productRespository.loadAll()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
 });
 
 // thoi gian deals
@@ -30,7 +33,7 @@ router.post('/dealtime', function (req, res) {
 
 // chi tiet deals
 router.post('/dealdetail', function (req, res) {
-    var arrDealDetail= new Array();
+	var arrDealDetail = new Array();
 	arrDealDetail.push(req.body.dealid);
 	dealRespository.getDealDetail(arrDealDetail)
 		.then(function (rows) {
@@ -45,7 +48,7 @@ router.post('/dealdetail', function (req, res) {
 
 // get gia cao nhat = id
 router.post('/dealprice', function (req, res) {
-    var arrDeal= new Array();
+	var arrDeal = new Array();
 	arrDeal.push(req.body.dealid);
 	dealRespository.getDealPrice(arrDeal)
 		.then(function (rows) {
@@ -60,7 +63,7 @@ router.post('/dealprice', function (req, res) {
 
 // get lich su dau gia
 router.post('/dealhistory', function (req, res) {
-    var arrDeal= new Array();
+	var arrDeal = new Array();
 	arrDeal.push(req.body.dealid);
 	dealRespository.getDealHistory(arrDeal)
 		.then(function (rows) {
@@ -76,7 +79,7 @@ router.post('/dealhistory', function (req, res) {
 
 // them nhat ki dau gia
 router.post('/insertdealhistory', function (req, res) {
-    var arrDeal= new Array();
+	var arrDeal = new Array();
 	arrDeal.push(req.body.dealid);
 	arrDeal.push(req.body.dealtime);
 	arrDeal.push(req.body.userid);
@@ -94,7 +97,7 @@ router.post('/insertdealhistory', function (req, res) {
 
 // update gia cao nhat san pham
 router.post('/updatedealprice', function (req, res) {
-	var arrDeal= new Array();
+	var arrDeal = new Array();
 	arrDeal.push(req.body.userid);
 	arrDeal.push(req.body.dealprice);
 	arrDeal.push(req.body.dealid);
@@ -110,41 +113,91 @@ router.post('/updatedealprice', function (req, res) {
 });
 
 //topBestBid
-router.get('/topbestbid', function(req, res) {
-    dealRespository.topBestBid()
-        .then(function (rows) {
-            res.json(rows);
-        })
-        .catch(function(err) {
-            console.log(err);
-            res.statusCode = 500;
-            res.end('View err log on console');
-        });
+router.get('/topbestbid', function (req, res) {
+	dealRespository.topBestBid()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View err log on console');
+		});
 });
 
 //topBestPrice
-router.get('/topbestprice',function(req, res){
-    dealRespository.topBestPrice()
-        .then(function(rows){
-            res.json(rows);
-        })
-        .catch(function(err){
-            console.log(err);
-            res.statusCode = 500;
-            res.end('View err log on console');
-        });
+router.get('/topbestprice', function (req, res) {
+	dealRespository.topBestPrice()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View err log on console');
+		});
 });
 
 //top5Timeout
-router.get('/toptimeout',function(req, res){
-    dealRespository.topTimeOut()
-        .then(function(rows){
-            res.json(rows);
-        })
-        .catch(function(err){
-            console.log(err);
-            res.statusCode = 500;
-            res.end('View err log on console');
-        });
+router.get('/toptimeout', function (req, res) {
+	dealRespository.topTimeOut()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View err log on console');
+		});
+});
+
+
+// tao deal moi
+router.post('/createdeal', function (req, res) {
+	var nameImg = new Array();
+
+	var appDir = path.dirname(require.main.filename);
+	var pathdir = appDir + '\\public\\img\\products\\';
+	var tempdir = appDir + '\\public\\img\\_temp';
+
+	req.files.uploadIMG.forEach(function (it) {
+		var nimg = 'img_' + String(new Date().getTime()) + '.' + String(it.mimetype).split('/')[1];
+		nameImg.push(nimg);
+		var pathsave = pathdir + nimg;
+		var readable = fs.createReadStream(it.file);
+		var writable = fs.createWriteStream(pathsave);
+		readable.pipe(writable);
+		rimraf(tempdir + '\\*', function () {});
+	});
+
+	var arrSP = new Array();
+	arrSP.push(req.body.nameProduct);
+	arrSP.push(req.body.idCategory);
+	arrSP.push(req.body.descriptionProduct);
+	nameImg.forEach(function(it){
+		arrSP.push(it);
+	});	
+	arrSP.push(req.body.priceProduct);
+	arrSP.push(req.body.pricenowProduct);
+	arrSP.push(req.body.pricestepProduct);
+
+	var arrDG = new Array();
+	arrDG.push(req.body.userid);
+	arrDG.push(req.body.useridpricemax);
+	arrDG.push(req.body.priceProduct);
+	arrDG.push(req.body.dealTimeCreate);
+	arrDG.push(req.body.dealTimeEnd);
+	dealRespository.insertDeal(arrSP, arrDG)
+		.then(function (rows) {
+			res.json({
+				result: 'OK',
+				msg: 'Đã tạo thành công đấu giá'
+			});
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View err log on console');
+		});
 });
 module.exports = router;
