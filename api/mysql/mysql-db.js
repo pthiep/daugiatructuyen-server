@@ -127,7 +127,7 @@ module.exports = {
 		return d.promise;
 	},
 
-	delete: function (sql) {
+	delete: function (sql, arr) {
 		var d = q.defer();
 
 		var con = mysql.createConnection({
@@ -138,7 +138,7 @@ module.exports = {
 		});
 
 		con.connect();
-		con.query(sql, function (err, rows, fields) {
+		con.query(sql, arr, function (err, rows, fields) {
 			if (err) {
 				d.reject(err);
 			} else {

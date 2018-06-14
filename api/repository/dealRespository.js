@@ -12,6 +12,12 @@ module.exports = {
 		return db.load(sql);
 	},
 
+	getListDeal: function (arr) {
+		var sql = 'select dg.manguoiban, dg.madaugia, sp.masanpham, sp.tensanpham, dg.giacaonhat, dg.thoigianketthuc '
+				+ 'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and manguoiban = ?';
+		return db.loadDetail(sql, arr);
+	},
+
 	// Get chi tiet san pham
 	getDealDetail: function (arr) {
 		var sql = 'select dg.madaugia, sp.masanpham, sp.tensanpham, dg.giacaonhat, ' +
@@ -71,7 +77,7 @@ module.exports = {
 	},
 
 	getDealHistory: function (arr) {
-		var sql = 'select convert_tz(nk.thoigiandaugia,\'+00:00\',\'+07:00\') as thoigiandaugia, nd.tennguoidung, nk.giadaugia from nhatkydaugia nk, ' +
+		var sql = 'select convert_tz(nk.thoigiandaugia,\'+00:00\',\'+07:00\') as thoigiandaugia, nd.manguoidung, nd.tennguoidung, nk.giadaugia from nhatkydaugia nk, ' +
 			'thongtinnguoidung nd where nk.manguoidaugia = nd.manguoidung and madaugia = ? ' +
 			'order by nk.thoigiandaugia desc';
 		return db.loadDetail(sql, arr);
@@ -87,6 +93,34 @@ module.exports = {
 	insertDealHistory: function (arr) {
 		var sql = 'insert into nhatkydaugia (madaugia, thoigiandaugia, manguoidaugia, giadaugia) ' +
 			'values (?, ?, ?, ?)';
+		return db.insert(sql, arr);
+	},
+
+	getListDescription: function (arr) {
+		var sql = 'select mamota, madaugia, mota, thoigianthem '
+				+ 'from nhatkymota where madaugia = ? order by thoigianthem asc';
+		return db.loadDetail(sql, arr);
+	},
+
+	insertDealDescription: function (arr) {
+		var sql = 'insert into nhatkymota (madaugia, mota, thoigianthem) ' +
+			'values (?, ?, ?)';
+		return db.insert(sql, arr);
+	},
+
+	updateDealDes: function (arr) {
+		var sql = 'update sanpham set mota = ? where masanpham = ?';
+		return db.update(sql, arr);
+	},
+
+	insertDealBan: function (arr) {
+		var sql = 'insert into camdaugia (manguoidung, madaugia) ' +
+			'values (?, ?)';
+		return db.insert(sql, arr);
+	},
+
+	deleteDealBan: function (arr) {
+		var sql = 'delete from nhatkydaugia where madaugia = ? and manguoidaugia = ?';
 		return db.insert(sql, arr);
 	},
 }
