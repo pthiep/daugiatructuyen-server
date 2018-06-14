@@ -15,6 +15,60 @@ router.get('/', function (req, res) {
         });
 });
 
+// Link get chi tiet product
+router.post('/productdetail', function (req, res) {
+    var arrProductDetail= new Array();
+	arrProductDetail.push(req.body.productid);
+	productRespository.getProductDetail(arrProductDetail)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+//top5BestBid
+router.get('/', function(req, res) {
+    productRespository.top5bestbid()
+        .then(function (rows) {
+            res.json(rows);
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View err log on console');
+        });
+});
+
+//top5BestPrice
+router.get('/',function(req, res){
+    productRespository.top5BestPrice()
+        .then(function(rows){
+            res.json(rows);
+        })
+        .catch(function(err){
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View err log on console');
+        });
+});
+
+//top5Timeout
+router.get('/',function(req, res){
+    productRespository.top5Timeout()
+        .then(function(rows){
+            res.json(rows);
+        })
+        .catch(function(err){
+            console.log(err);
+            res.statusCode = 500;
+            res.end('View err log on console');
+        });
+});
+
 //get by id
 router.get('/:id', (req, res) => {
     if(req.params.id) {
@@ -43,21 +97,6 @@ router.get('/:id', (req, res) => {
         res.statusCode = 400;
         res.json('error');
     }
-});
-
-// Link get chi tiet product
-router.post('/productdetail', function (req, res) {
-    var arrProductDetail= new Array();
-	arrProductDetail.push(req.body.productid);
-	productRespository.getProductDetail(arrProductDetail)
-		.then(function (rows) {
-			res.json(rows);
-		})
-		.catch(function (err) {
-			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
-		});
 });
 
 router.post('/', (req, res)=>{

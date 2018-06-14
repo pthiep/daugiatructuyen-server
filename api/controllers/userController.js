@@ -1,11 +1,15 @@
 var userRespository = require('../repository/userRespository');
 var express = require('express');
 var router = express.Router();
+var jwt = require('jsonwebtoken');
+
+var SECRET_KEY = 'secret';
 
 // lay tat ca thong tin nguoi dung (xoa sau khi hoan tat project)
 router.get('/', function (req, res) {
 	userRespository.loadAll()
 		.then(function (rows) {
+			console.log('OK');
 			res.json(rows);
 		})
 		.catch(function (err) {
@@ -15,110 +19,125 @@ router.get('/', function (req, res) {
 		});
 });
 
-router.post('/checkuser', function (req, res) {
-	var arr = new Array();
-	arr.push(req.body.username);
-	arr.push(req.body.password);
-	userRespository.checkUser(arr)
-		.then(function (results) {
-			res.json(results);
-		})
-		.catch(function (err) {
-			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
-		});
-});
-
-router.post('/checkrulesale', function (req, res) {
-	var arr = new Array();
-	arr.push(req.body.userid);
-	userRespository.getRuleSale(arr)
-		.then(function (results) {
-			res.json(results);
-		})
-		.catch(function (err) {
-			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
-		});
-});
-
-// update login
+// login
 router.post('/login', function (req, res) {
-	var arrData = new Array();
-	arrData.push(req.body.status);
-	arrData.push(req.body.userid);
-	userRespository.loginStatus(arrData)
+	var arrLogin = new Array();
+	arrLogin.push(req.body.email);
+	arrLogin.push(req.body.password);
+
+	userRespository.checkUser(arrLogin)
 		.then(function (rows) {
-			res.json({
-				msg: 'Cập nhật trạng thái đăng nhập'
-			});
+			var isLogin = false;
+			var user = {};
+			var payload = {
+				msg: String,
+				isLogin: Boolean,
+				userObj: Object
+			}
+			var token = null;
+			if (typeof rows !== 'undefined' && rows.length > 0) {
+				isLogin = true;
+				var arrUser = new Array();
+				arrUser.push(rows[0].mathongtin);
+				userRespository.getUser(arrUser)
+					.then(function (rows) {
+						user.userid = rows[0].manguoidung;
+						user.username = rows[0].tennguoidung;
+						user.address = rows[0].diachi;
+
+						payload.msg = "Get token successed."
+						payload.isLogin = true;
+						payload.userObj = user;
+
+						token = jwt.sign(payload, SECRET_KEY, {
+							expiresIn: 120
+						});
+						res.json({
+							access_token: token
+						});
+					})
+					.catch(function (err) {
+						console.log(err);
+						res.statusCode = 500;
+						res.end('View error log on console');
+					});
+			} else {
+				payload.msg = "Get token failed."
+				payload.isLogin = false;
+
+				token = jwt.sign(payload, SECRET_KEY, {
+					expiresIn: 120
+				});
+				res.json({
+					access_token: token
+				});
+			}
 		})
 		.catch(function (err) {
 			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
+			res.statusCode = 401;
+			res.json({
+				msg: 'Wrong email or password !!!'
+			});
 		});
 });
+
+
+router.post('/signup', (req, res) => {
+	let email = req.body.email
+	let password = req.body.password
+	let params = [email,password]
+
+	userRespository.postUser(params)
+		.then(result => {
+			if(result.affectedRows > 0)
+				res.status(200).json({
+					msg: 'OK'
+				})
+			else
+				res.status(401).json({ msg: 'ERROR'})
+		})
+		.catch(err => res.status(401).json({smg: 'Unexpected error, Please try again later!' }))
+		
+})
+
+var checkToken = (req, res, next) => {
+    var token = req.headers['x-access-token'];
+    if (token) {
+        jwt.verify(token, SECRET_KEY, (err, payload) => {
+            if (err) {
+                res.statusCode = 401;
+                res.json({
+                    msg: 'Verify failed',
+                    error: err
+                });
+            } else {
+                req.tokenPayload = payload;
+                next();
+            }
+        });
+    } else {
+        res.statusCode = 403;
+        res.json({
+            msg: 'No token found'
+        });
+    }
+};
+
+// secured
+router.get('/secured', checkToken, function (req, res) {
+	res.json({
+        msg: 'Secured',
+        payload: req.tokenPayload
+    });
+});
+
 
 // like product
 router.post('/likeproduct', function (req, res) {
 	var arrLikeProduct = new Array();
 	arrLikeProduct.push(req.body.userid);
 	userRespository.getListLikeProduct(arrLikeProduct)
-		.then(function (rows) {
-			res.json(rows);
-		})
-		.catch(function (err) {
-			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
-		});
-});
-
-// insert danh gia nguoi dung
-router.post('/insertreviewuser', function (req, res) {
-	var arr = new Array();
-	arr.push(req.body.userid);
-	arr.push(req.body.useridpur);
-	arr.push(req.body.status);
-	arr.push(req.body.review);
-	userRespository.insertReview(arr)
-		.then(function (rows) {
-			res.json(rows);
-		})
-		.catch(function (err) {
-			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
-		});
-});
-
-// get luot thich va khong thich
-router.post('/getnumreviewuser', function (req, res) {
-	var arr = new Array();
-	arr.push(req.body.userid);
-	arr.push(req.body.userid);
-	
-	userRespository.getNumReview(arr)
-		.then(function (rows) {
-			console.log(rows);
-			res.json(rows);
-		})
-		.catch(function (err) {
-			console.log(err);
-			res.statusCode = 500;
-			res.end('View error log on console');
-		});
-});
-
-// check id da reviews chua
-router.post('/checkreviewuser', function (req, res) {
-	var arr = new Array();
-	arr.push(req.body.userid);
-	arr.push(req.body.useridpur);
-	userRespository.checkReview(arr)
 		.then(function (rows) {
 			res.json(rows);
 		})
