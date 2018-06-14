@@ -57,9 +57,27 @@ module.exports = {
 		return db.loadDetail(sql, arr);
 	},
 
-	// INSERT
+	// update
 	loginStatus: function (arr){
 		var sql = 'update nguoidung set dangnhap = ? where manguoidung = ?';
 		return db.update(sql, arr);
+	},
+
+	insertReview: function (arr) {
+		var sql = 'insert into danhgianguoidung (manguoidanhgia, manguoiduocdanhgia, trangthai, danhgia) ' +
+			'values (?, ?, ?, ?)';
+		return db.insert(sql, arr);
+	},
+	getNumReview: function (arr) {
+		var sql = 'select * from ' 
+				+ '(select manguoiduocdanhgia, count(*) as soluotthich from danhgianguoidung where manguoiduocdanhgia = ? and trangthai = 0 group by trangthai) as lt, '
+				+ '(select count(*) as soluotkhongthich from danhgianguoidung where manguoiduocdanhgia = ? and trangthai = 1 group by trangthai) as lkt, '
+				+ 'thongtinnguoidung tt '
+				+ 'where tt.manguoidung = manguoiduocdanhgia';
+		return db.loadDetail(sql, arr);
+	},
+	checkReview: function (arr) {
+		var sql = 'select * from danhgianguoidung where manguoidanhgia = ? and manguoiduocdanhgia = ?';
+		return db.loadDetail(sql, arr);
 	},
 }

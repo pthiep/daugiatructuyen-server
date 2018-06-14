@@ -13,8 +13,10 @@ module.exports = {
 	},
 
 	getListDeal: function (arr) {
-		var sql = 'select dg.manguoiban, dg.madaugia, sp.masanpham, sp.tensanpham, dg.giacaonhat, dg.thoigianketthuc '
-				+ 'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and manguoiban = ?';
+		var sql = 'select dg.manguoiban, dg.madaugia, sp.masanpham, sp.tensanpham, dg.giacaonhat, dg.thoigianketthuc, '
+				+ 'dg.manguoidaugiacaonhat, tt.tennguoidung as tennguoimuacaonhat '
+				+ 'from daugia dg, sanpham sp, thongtinnguoidung tt where dg.masanpham = sp.masanpham and '
+				+ 'dg.manguoidaugiacaonhat = tt.manguoidung and manguoiban = ?';
 		return db.loadDetail(sql, arr);
 	},
 

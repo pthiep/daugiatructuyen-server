@@ -77,4 +77,56 @@ router.post('/likeproduct', function (req, res) {
 		});
 });
 
+// insert danh gia nguoi dung
+router.post('/insertreviewuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.useridpur);
+	arr.push(req.body.status);
+	arr.push(req.body.review);
+	userRespository.insertReview(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// get luot thich va khong thich
+router.post('/getnumreviewuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.userid);
+	
+	userRespository.getNumReview(arr)
+		.then(function (rows) {
+			console.log(rows);
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// check id da reviews chua
+router.post('/checkreviewuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.useridpur);
+	userRespository.checkReview(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 module.exports = router;
