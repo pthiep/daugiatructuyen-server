@@ -16,80 +16,49 @@ router.get('/', (req, res) => {
 });
 
 //get by id
-router.post('/catedetail', (req, res) => {
-	if (req.body.cateid) {
-		var id = req.body.cateid;
-		if (isNaN(id)) {
-			res.statusCode = 400;
-			res.end();
-			return;
-		}
-		var arr = new Array();
-		arr.push(req.body.cateid);
-
-		categoryRespository.getCateDetail(arr)
-			.then(rows => {
-				if (rows.length > 0) {
-					res.json(rows[0]);
-				} else {
-					res.statusCode = 204;
-					res.end();
-
-				}
-			})
-			.catch(err => {
-				console.log(err);
-				res.statusCode = 500;
-				res.json('error');
-			});
-
-	} else {
-		res.statusCode = 400;
-		res.json('error');
-	}
-});
-
-router.post('/', (req, res) => {
-	categoryRespository.insert(req.body)
-		.then(insertId => {
-			var poco = {
-				madanhmuc: insertId,
-				tendanhmuc: req.body.tendanhmuc
-			};
-			res.statusCode = 201;
-			res.json(poco);
+router.post('/addcategory', (req, res) => {
+	var arr = new Array();
+	arr.push(req.body.namecate);
+	categoryRespository.insertCategory(arr)
+		.then(function (results) {
+			res.json(results);
 		})
-		.catch(err => {
+		.catch(function (err) {
 			console.log(err);
 			res.statusCode = 500;
-			res.end();
-
+			res.end('View error log on console');
 		});
 });
 
-router.delete('/:id', (req, res) => {
-	if (req.params.id) {
-		var id = req.params.id;
-		if (isNaN(id)) {
-			res.statusCode = 400;
-			res.end();
-			return;
-		}
-
-		categoryRespository.delete(id).then(affectedRows => {
-			res.json({
-				affectedRows: affectedRows
-			});
-
-		}).catch(err => {
+router.post('/deletecategory', (req, res) => {
+	var arr = new Array();
+	arr.push(req.body.nameid);
+	categoryRespository.deleteCategory(arr)
+		.then(function (results) {
+			res.json(results);
+		})
+		.catch(function (err) {
 			console.log(err);
 			res.statusCode = 500;
-			res.json('error');
+			res.end('View error log on console');
 		});
-	} else {
-		res.statusCode = 400;
-		res.json('error');
-	}
+});
+
+router.post('/updatecategory', (req, res) => {
+	console.log(req.body.namecate);
+	var arr = new Array();
+	arr.push(req.body.namecate);
+	arr.push(req.body.nameid);
+	console.log(arr);
+	categoryRespository.updateCategory(arr)
+		.then(function (results) {
+			res.json(results);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
 });
 
 module.exports = router;

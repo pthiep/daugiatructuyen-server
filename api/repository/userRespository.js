@@ -141,5 +141,16 @@ module.exports = {
 	insertLikeDeal: function (arr) {
 		var sql = 'insert into sanphamyeuthich (manguoidung, masanpham) values (?, ?)';
 		return db.insert(sql, arr);
+	},
+
+	deleteUser : function (arr) {
+		var sql = 'delete from thongtinnguoidung where manguoidung = ?';
+		return db.delete(sql, arr);
+	},
+
+	getListSaleRule : function () {
+		var sql = 'select * from thongtinnguoidung t, yeucauquyenban y where t.manguoidung = y.manguoidung';
+		return db.load(sql);
 	}
+
 }

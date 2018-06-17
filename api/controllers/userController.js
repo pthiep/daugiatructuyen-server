@@ -306,4 +306,30 @@ router.post('/insertlikedeal', function (req, res) {
 		});
 });
 
+router.post('/deleteuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.deleteUser(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.get('/getlistsalerule', function (req, res) {
+	userRespository.getListSaleRule()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
 module.exports = router;
+

@@ -13,6 +13,7 @@ var productController = require('./api/controllers/productController');
 var userController = require('./api/controllers/userController');
 var dealController = require('./api/controllers/dealController');
 var cateController = require('./api/controllers/categoryController');
+var adminController = require('./api/controllers/adminController');
 
 var homeSocket = require('./socket/socket_home');
 var dealSocket = require('./socket/socket_deal');
@@ -75,6 +76,7 @@ app.use('/products', productController);
 app.use('/users', userController);
 app.use('/deals', dealController);
 app.use('/categories', cateController);
+app.use('/admin', adminController);
 
 // Socket.IO
 io.on('connection', function (socket) {
