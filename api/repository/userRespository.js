@@ -41,7 +41,8 @@ module.exports = {
 	},
 
 	getUser: function (arr) {
-		var sql = 'select * from thongtinnguoidung where manguoidung = ?';
+		var sql = 'select nd.manguoidung, nd.email, tt.tennguoidung from nguoidung nd, thongtinnguoidung tt '
+				+ 'where nd.manguoidung = tt.manguoidung and tt.manguoidung = ?';
 		return db.loadDetail(sql, arr);
 	},
 
@@ -80,4 +81,65 @@ module.exports = {
 		var sql = 'select * from danhgianguoidung where manguoidanhgia = ? and manguoiduocdanhgia = ?';
 		return db.loadDetail(sql, arr);
 	},
+
+	deleteLikeProduct: function(arr) {
+		var sql = 'delete from sanphamyeuthich where manguoidung = ? and masanpham = ?';
+		return db.delete(sql, arr);
+	},
+
+	updateEmailUser: function (arr){
+		var sql = 'update nguoidung set email = ? where manguoidung = ?';
+		return db.update(sql, arr);
+	},
+
+	updateNameUser: function (arr){
+		var sql = 'update thongtinnguoidung set tennguoidung = ? where manguoidung = ?';
+		return db.update(sql, arr);
+	},
+
+	updatePassword: function (arr){
+		var sql = 'update nguoidung set matkhau = ? where manguoidung = ?';
+		return db.update(sql, arr);
+	},
+
+	checkPassword: function (arr){
+		var sql = 'select manguoidung, matkhau from nguoidung where manguoidung = ?';
+		return db.loadDetail(sql, arr);
+	},
+	
+	getNumReview: function (arr) {
+		var sql = 'select tong.manguoiduocdanhgia, tong.tongdanhgia, chitiet.soluongthich from '
+		+ '(select manguoiduocdanhgia,  count(*) as tongdanhgia from danhgianguoidung where manguoiduocdanhgia = ?) as tong, '
+		+ '(select manguoiduocdanhgia, count(*) as soluongthich from danhgianguoidung where manguoiduocdanhgia = ? and trangthai = 0) as chitiet '
+		+ 'where tong.manguoiduocdanhgia = chitiet.manguoiduocdanhgia';
+		return db.loadDetail(sql, arr);
+	},
+
+	getListReview: function (arr) {
+		var sql = 'select tt.manguoidung, tt.tennguoidung, dg.danhgia, dg.trangthai from '
+				+ 'danhgianguoidung dg, thongtinnguoidung tt where '
+				+ 'dg.manguoidanhgia = tt.manguoidung and manguoiduocdanhgia = ?';
+		return db.loadDetail(sql, arr);
+	},
+
+	getListDealing: function (arr) {
+		var sql = 'select nk.madaugia, sp.tensanpham from '
+				+ 'nhatkydaugia nk, daugia dg, sanpham sp where '
+				+ 'nk.madaugia = dg.madaugia and dg.masanpham = sp.masanpham '
+				+ 'and manguoidaugia = ? and now() < dg.thoigianketthuc '
+				+ 'group by nk.manguoidaugia, nk.madaugia';
+		return db.loadDetail(sql, arr);
+	},
+
+	getListDealWin: function (arr) {
+		var sql = 'select dg.madaugia, sp.tensanpham from '
+				+ 'daugia dg, sanpham sp where dg.masanpham = sp.masanpham '
+				+ 'and manguoidaugiacaonhat = ? and now() > thoigianketthuc';
+		return db.loadDetail(sql, arr);
+	},
+
+	insertLikeDeal: function (arr) {
+		var sql = 'insert into sanphamyeuthich (manguoidung, masanpham) values (?, ?)';
+		return db.insert(sql, arr);
+	}
 }

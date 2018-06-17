@@ -13,10 +13,10 @@ module.exports = {
 	},
 
 	getListDeal: function (arr) {
-		var sql = 'select dg.manguoiban, dg.madaugia, sp.masanpham, sp.tensanpham, dg.giacaonhat, dg.thoigianketthuc, '
-				+ 'dg.manguoidaugiacaonhat, tt.tennguoidung as tennguoimuacaonhat '
-				+ 'from daugia dg, sanpham sp, thongtinnguoidung tt where dg.masanpham = sp.masanpham and '
-				+ 'dg.manguoidaugiacaonhat = tt.manguoidung and manguoiban = ?';
+		var sql = 'select dg.manguoiban, dg.madaugia, sp.masanpham, sp.tensanpham, dg.giacaonhat, dg.thoigianketthuc, ' +
+			'dg.manguoidaugiacaonhat, tt.tennguoidung as tennguoimuacaonhat ' +
+			'from daugia dg, sanpham sp, thongtinnguoidung tt where dg.masanpham = sp.masanpham and ' +
+			'dg.manguoidaugiacaonhat = tt.manguoidung and manguoiban = ?';
 		return db.loadDetail(sql, arr);
 	},
 
@@ -86,10 +86,10 @@ module.exports = {
 	},
 	insertDeal: function (arr1, arr2) {
 		var sqldaugia = 'insert into sanpham (tensanpham, madanhmuc, mota, link_img1, link_img2, link_img3, giagoc, giamuangay, buocgia) ' +
-						'values (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+			'values (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 		var sqlsanpham = 'insert into daugia (manguoiban, manguoidaugiacaonhat, giacaonhat, thoigiandang, thoigianketthuc, masanpham) ' +
-						 'values (?, ?, ?, ?, ?, ?); ';
-		return db.insertdouble(sqldaugia,sqlsanpham, arr1, arr2);
+			'values (?, ?, ?, ?, ?, ?); ';
+		return db.insertdouble(sqldaugia, sqlsanpham, arr1, arr2);
 	},
 
 	insertDealHistory: function (arr) {
@@ -99,8 +99,8 @@ module.exports = {
 	},
 
 	getListDescription: function (arr) {
-		var sql = 'select mamota, madaugia, mota, thoigianthem '
-				+ 'from nhatkymota where madaugia = ? order by thoigianthem asc';
+		var sql = 'select mamota, madaugia, mota, thoigianthem ' +
+			'from nhatkymota where madaugia = ? order by thoigianthem asc';
 		return db.loadDetail(sql, arr);
 	},
 
@@ -124,5 +124,18 @@ module.exports = {
 	deleteDealBan: function (arr) {
 		var sql = 'delete from nhatkydaugia where madaugia = ? and manguoidaugia = ?';
 		return db.insert(sql, arr);
+	},
+
+	searchAll: function () {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc';
+		return db.load(sql);
+	},
+
+	checkLikeDeal: function (arr) {
+		var sql = 'select * from sanphamyeuthich where manguoidung = ? and masanpham = ?';
+		return db.loadDetail(sql, arr);
 	},
 }

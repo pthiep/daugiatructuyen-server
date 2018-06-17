@@ -129,4 +129,181 @@ router.post('/checkreviewuser', function (req, res) {
 		});
 });
 
+// xoa san pham yeu thich
+router.post('/deletelikeproduct', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.dealid);
+	userRespository.deleteLikeProduct(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// get thong tin nguoi dung
+router.post('/getuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.getUser(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// cập nhật email
+router.post('/updateemailuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.newemail);
+	arr.push(req.body.userid);
+	userRespository.updateEmailUser(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// cập nhật tên
+router.post('/updatenameuser', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.newname);
+	arr.push(req.body.userid);
+	userRespository.updateNameUser(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// cập nhật mật khẩu
+router.post('/updatepass', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.password);
+	arr.push(req.body.userid);
+	userRespository.updatePassword(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// kiem tra mat khau cu
+router.post('/checkoldpass', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.password);
+	userRespository.checkPassword(arr)
+		.then(function (rows) {
+			if (rows[0].matkhau === req.body.password){
+				res.json({
+					result: true
+				});
+			} else {
+				res.json({
+					result: false
+				});
+			}
+			
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+// cập nhật mật khẩu
+router.post('/getnumreview', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.userid);
+	userRespository.getNumReview(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/getlistreview', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.getListReview(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/getlistdealing', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.getListDealing(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/getlistdealwin', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.getListDealWin(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/insertlikedeal', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.dealid);
+	userRespository.insertLikeDeal(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 module.exports = router;
