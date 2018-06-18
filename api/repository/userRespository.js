@@ -1,5 +1,4 @@
 var db = require('../mysql/mysql-db')
-var q = require('q');
 
 module.exports = {
 	// GET
@@ -151,6 +150,12 @@ module.exports = {
 	getListSaleRule : function () {
 		var sql = 'select * from thongtinnguoidung t, yeucauquyenban y where t.manguoidung = y.manguoidung';
 		return db.load(sql);
-	}
+	},
+  
+  exports.postUser = (arr) => {
+	let sql = `insert into nguoidung values( ${null}, '${arr[0]}', '${arr[1]}', ${null})`
+	return db.insert(sql);
+} 
 
 }
+

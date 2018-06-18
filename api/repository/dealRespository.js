@@ -139,3 +139,4 @@ module.exports = {
 		return db.loadDetail(sql, arr);
 	},
 }
+
