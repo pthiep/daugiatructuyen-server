@@ -31,4 +31,31 @@ router.post('/dealdetail', function (req, res) {
 });
 
 
+router.get('/searchall', function (req, res) {
+	dealRespository.searchAll()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/checklikedeal', function (req, res) {
+	var arrDeal = new Array();
+	arrDeal.push(req.body.userid);
+	arrDeal.push(req.body.dealid);
+	dealRespository.checkLikeDeal(arrDeal)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 module.exports = router;
