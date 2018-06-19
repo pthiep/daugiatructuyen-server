@@ -15,7 +15,6 @@ router.get('/', (req, res) => {
 		});
 });
 
-//get by id
 router.post('/addcategory', (req, res) => {
 	var arr = new Array();
 	arr.push(req.body.namecate);
@@ -32,7 +31,7 @@ router.post('/addcategory', (req, res) => {
 
 router.post('/deletecategory', (req, res) => {
 	var arr = new Array();
-	arr.push(req.body.nameid);
+	arr.push(req.body.cateid);
 	categoryRespository.deleteCategory(arr)
 		.then(function (results) {
 			res.json(results);
@@ -47,7 +46,7 @@ router.post('/deletecategory', (req, res) => {
 router.post('/updatecategory', (req, res) => {
 	var arr = new Array();
 	arr.push(req.body.namecate);
-	arr.push(req.body.nameid);
+	arr.push(req.body.cateid);
 	categoryRespository.updateCategory(arr)
 		.then(function (results) {
 			res.json(results);

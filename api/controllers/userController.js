@@ -89,6 +89,21 @@ router.post('/checkuser', function (req, res) {
 		});
 });
 
+router.post('/checkuseradmin', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.username);
+	arr.push(req.body.password);
+	userRespository.checkUserAD(arr)
+		.then(function (results) {
+			res.json(results);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 router.post('/checkrulesale', function (req, res) {
 	var arr = new Array();
 	arr.push(req.body.userid);
@@ -370,7 +385,15 @@ router.post('/deleteuser', function (req, res) {
 	arr.push(req.body.userid);
 	userRespository.deleteUser(arr)
 		.then(function (rows) {
-			res.json(rows);
+			userRespository.deleteInfoUser(arr)
+				.then(function (rows) {
+					res.json(rows);
+				})
+				.catch(function (err) {
+					console.log(err);
+					res.statusCode = 500;
+					res.end('View error log on console');
+				});
 		})
 		.catch(function (err) {
 			console.log(err);
@@ -411,6 +434,56 @@ router.post('/regsalerule', function (req, res) {
 
 router.get('/getlistsalerule', function (req, res) {
 	userRespository.getListSaleRule()
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/acceptsale', function (req, res) {
+	var arr = new Array();
+
+	Date.prototype.addDays = function (days) {
+		var dat = new Date(this.valueOf());
+		dat.setDate(dat.getDate() + days);
+		return dat;
+	}
+	var dat = new Date();
+
+	arr.push(dat.addDays(7));
+	arr.push(req.body.userid);
+
+	userRespository.acceptSale(arr)
+		.then(function (rows) {
+			var arrde = new Array();
+			arrde.push(req.body.userid);
+			userRespository.deleteReqSale(arrde)
+				.then(function (rows) {
+					res.json(rows);
+				})
+				.catch(function (err) {
+					console.log(err);
+					res.statusCode = 500;
+					res.end('View error log on console');
+				});
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/resetpass', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.pass);
+	arr.push(req.body.userid);
+	console.log(arr);
+	userRespository.resetPass(arr)
 		.then(function (rows) {
 			res.json(rows);
 		})
