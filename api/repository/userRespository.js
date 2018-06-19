@@ -1,4 +1,5 @@
 var db = require('../mysql/mysql-db')
+var q = require('q');
 
 module.exports = {
 	// GET
@@ -151,11 +152,37 @@ module.exports = {
 		var sql = 'select * from thongtinnguoidung t, yeucauquyenban y where t.manguoidung = y.manguoidung';
 		return db.load(sql);
 	},
-  
-  exports.postUser = (arr) => {
-	let sql = `insert into nguoidung values( ${null}, '${arr[0]}', '${arr[1]}', ${null})`
-	return db.insert(sql);
-} 
 
+	checkEmail: function(arr) {
+		let sql = 'select * from nguoidung where email = ?';  
+		return db.loadDetail(sql, arr);
+	},
+
+	postUser: function(arr) {
+		let sql = 'insert into nguoidung (email, matkhau, mathongtin, dangnhap, maquyen) '
+				+ 'values (?, ?, 0, 1, 1)';  
+		return db.insert(sql, arr);
+	},
+
+	updateiduser: function(arr) {
+		let sql = 'update nguoidung set mathongtin = ? where manguoidung = ?';  
+		return db.update(sql, arr);
+	},
+
+	insertinfouser: function(arr) {
+		let sql = 'insert into thongtinnguoidung (manguoidung, tennguoidung) '
+				+ 'values (?, ?)';  
+		return db.insert(sql, arr);
+	},
+
+	regSaleRule: function(arr) {
+		let sql = 'insert into yeucauquyenban (manguoidung, thoigian) '
+				+ 'values (?, ?)';
+		return db.insert(sql, arr);
+	},
+
+	checkRegSaleRule: function(arr) {
+		let sql = 'select * from yeucauquyenban where manguoidung = ?';
+		return db.loadDetail(sql, arr);
+	},
 }
-

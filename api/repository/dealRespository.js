@@ -28,7 +28,7 @@ module.exports = {
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
 			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
 			'convert_tz(now(),\'+00:00\',\'+07:00\') as thoigianhientai, ' +
-			'sp.mota, nb.luotthich as danhgianguoiban, nm.luotthich as danhgianguoimua  from daugia dg, ' +
+			'sp.mota, sp.link_img1, sp.link_img2, sp.link_img3, dg.damua from daugia dg, ' +
 			'sanpham sp , thongtinnguoidung nb, thongtinnguoidung nm ' +
 			'where dg.manguoidaugiacaonhat = nm.manguoidung and dg.manguoiban = nb.manguoidung ' +
 			'and dg.masanpham = sp.masanpham and dg.madaugia = ?';
@@ -39,7 +39,8 @@ module.exports = {
 	topBestBid: function () {
 		var sql = 'select nk.madaugia , count(*) as soluongdaugia, dg.giacaonhat, sp.tensanpham, ' +
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
-			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
 			'from nhatkydaugia nk, daugia dg, sanpham sp ' +
 			'where nk.madaugia = dg.madaugia and dg.masanpham = sp.masanpham and dg.thoigianketthuc > now()' +
 			'group by nk.madaugia order by soluongdaugia desc limit 5';
@@ -50,7 +51,8 @@ module.exports = {
 	topBestPrice: function () {
 		var sql = 'select dg.madaugia, dg.giacaonhat, sp.tensanpham, ' +
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
-			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
 			'from daugia dg, sanpham sp ' +
 			'where dg.masanpham = sp.masanpham and dg.thoigianketthuc > now()' +
 			'order by dg.giacaonhat desc limit 5';
@@ -61,7 +63,8 @@ module.exports = {
 	topTimeOut: function () {
 		var sql = 'select dg.madaugia, dg.giacaonhat, sp.tensanpham, ' +
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
-			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
 			'from daugia dg, sanpham sp ' +
 			'where dg.masanpham = sp.masanpham and dg.thoigianketthuc > now()' +
 			'order by thoigianketthuc asc limit 5';
@@ -87,8 +90,8 @@ module.exports = {
 	insertDeal: function (arr1, arr2) {
 		var sqldaugia = 'insert into sanpham (tensanpham, madanhmuc, mota, link_img1, link_img2, link_img3, giagoc, giamuangay, buocgia) ' +
 			'values (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-		var sqlsanpham = 'insert into daugia (manguoiban, manguoidaugiacaonhat, giacaonhat, thoigiandang, thoigianketthuc, masanpham) ' +
-			'values (?, ?, ?, ?, ?, ?); ';
+		var sqlsanpham = 'insert into daugia (manguoiban, manguoidaugiacaonhat, giacaonhat, thoigiandang, thoigianketthuc, giahan, masanpham) ' +
+			'values (?, ?, ?, ?, ?, ?, ?); ';
 		return db.insertdouble(sqldaugia, sqlsanpham, arr1, arr2);
 	},
 
@@ -126,11 +129,61 @@ module.exports = {
 		return db.insert(sql, arr);
 	},
 
-	searchAll: function () {
+	searchAll: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc ' +
+			'limit ? , 12';
+		return db.loadDetail(sql, arr);
+	},
+
+	searchCate: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham ' +
+			'and sp.madanhmuc = ? and now() < dg.thoigianketthuc limit ? , 12';
+		return db.loadDetail(sql, arr);
+	},
+
+	searchString: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and ' +
+			'sp.tensanpham LIKE \'%' + arr[0] + '%\' and now() < dg.thoigianketthuc limit ' + arr[1] + ' , 12';
+		console.log(sql);
+		return db.load(sql);
+	},
+
+	searchAllPage: function (arr) {
 		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
 			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
-			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc';
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc ';
+		return db.loadDetail(sql, arr);
+	},
+
+	searchCatePage: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham ' +
+			'and sp.madanhmuc = ? and now() < dg.thoigianketthuc';
+		return db.loadDetail(sql, arr);
+	},
+
+	searchStringPage: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and ' +
+			'sp.tensanpham LIKE \'%' + arr[0] + '%\' and now() < dg.thoigianketthuc';
+		console.log(sql);
 		return db.load(sql);
 	},
 
@@ -138,5 +191,9 @@ module.exports = {
 		var sql = 'select * from sanphamyeuthich where manguoidung = ? and masanpham = ?';
 		return db.loadDetail(sql, arr);
 	},
-}
 
+	updateBuyNow: function (arr) {
+		var sql = 'update daugia set damua = 0 where madaugia = ' + arr[2];
+		return db.updatenon(sql);
+	},
+}
