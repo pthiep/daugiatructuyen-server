@@ -494,4 +494,21 @@ router.post('/resetpass', function (req, res) {
 		});
 });
 
+router.post('/checkuserban', function (req, res) {
+	var arr = new Array();
+	arr.push(req.body.userid);
+	arr.push(req.body.dealid);
+	console.log(arr);
+	userRespository.checkUserBan(arr)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+
 module.exports = router;

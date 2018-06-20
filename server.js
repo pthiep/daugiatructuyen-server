@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser')
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 var bb = require('express-busboy');
+var nodemailer = require('nodemailer');
 
 var timeController = require('./api/controllers/timeController');
 var jwtController = require('./api/controllers/jwtController');
@@ -75,6 +76,75 @@ app.use('/products', productController);
 app.use('/users', userController);
 app.use('/deals', dealController);
 app.use('/categories', cateController);
+
+var dealRespository = require('./api/repository/dealRespository');
+let i = 0;
+setInterval(() => {
+	var time = new Date().toLocaleString();
+	dealRespository.getListDealTime(String(time))
+		.then(function (rows) {
+			if (Array.isArray(rows) && rows.length > 0) {
+				rows.forEach(element => {
+					var transporter = nodemailer.createTransport({ // config mail server
+						service: 'Gmail',
+						auth: {
+							user: 'dapxekhongyen@gmail.com',
+							pass: '01694424958'
+						}
+					});
+
+					if (element.manguoidaugiacaonhat === 1) {
+						var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+							from: 'ADMIN',
+							to: element.email1,
+							subject: 'Thông báo',
+							text: 'Bạn nhận được thông báo từ ADMIN',
+							html: 'Phiên đấu giá <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + element.madaugia + '">' + element.tensanpham + '</a> đã kết thúc mà không có cái đấu giá'
+						}
+
+						transporter.sendMail(mainOptions, function (err, info) {
+							if (err) {
+								console.log(err);
+							}
+						});
+
+					} else {
+						var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+							from: 'ADMIN',
+							to: element.email1,
+							subject: 'Thông báo',
+							text: 'Bạn nhận được thông báo từ ADMIN',
+							html: 'Phiên đấu giá <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + element.madaugia + '">' + element.tensanpham + '</a> đã kết thúc thành công'
+						}
+
+						transporter.sendMail(mainOptions, function (err, info) {
+							if (err) {
+								console.log(err);
+							}
+						});
+
+						var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+							from: 'ADMIN',
+							to: element.email2,
+							subject: 'Thông báo',
+							text: 'Bạn nhận được thông báo từ ADMIN',
+							html: 'Phiên đấu giá <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + element.madaugia + '">' + element.tensanpham + '</a> đã kết thúc thành công'
+						}
+
+						transporter.sendMail(mainOptions, function (err, info) {
+							if (err) {
+								console.log(err);
+							}
+						});
+					}
+				});
+			}
+		})
+		.catch(function (err) {
+			console.log(err);
+		});
+}, 1000)
+
 
 // Socket.IO
 io.on('connection', function (socket) {

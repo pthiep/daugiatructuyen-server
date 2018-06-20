@@ -244,4 +244,9 @@ module.exports = {
 		var sql = 'update nguoidung set matkhau = ? where manguoidung = ?';
 		return db.update(sql, arr);
 	},
+
+	checkUserBan: function (arr) {
+		var sql = 'select * from camdaugia where manguoidung = ? and madaugia = ?';
+		return db.loadDetail(sql, arr);
+	},
 }

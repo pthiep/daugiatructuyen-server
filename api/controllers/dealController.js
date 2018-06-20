@@ -1,9 +1,11 @@
 var dealRespository = require('../repository/dealRespository');
+var userRespository = require('../repository/userRespository');
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var path = require('path');
 var rimraf = require('rimraf');
+var nodemailer = require('nodemailer');
 
 // Link API "/deals"
 router.get('/', function (req, res) {
@@ -101,9 +103,77 @@ router.post('/updatedealprice', function (req, res) {
 	arrDeal.push(req.body.userid);
 	arrDeal.push(req.body.dealprice);
 	arrDeal.push(req.body.dealid);
-	dealRespository.updateDealPrice(arrDeal)
+
+	var transporter = nodemailer.createTransport({ // config mail server
+		service: 'Gmail',
+		auth: {
+			user: 'dapxekhongyen@gmail.com',
+			pass: '01694424958'
+		}
+	});
+
+	dealRespository.getDealPrice([req.body.dealid])
 		.then(function (rows) {
-			res.json(rows);
+			var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+				from: 'ADMIN',
+				to: rows[0].email,
+				subject: 'Thông báo',
+				text: 'Bạn nhận được thông báo từ ADMIN',
+				html: 'Đã có người khác ra giá thành công <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '">' + 'http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '</a>'
+			}
+
+			transporter.sendMail(mainOptions, function (err, info) {
+				if (err) {
+					console.log(err);
+				}
+			});
+
+			dealRespository.updateDealPrice(arrDeal)
+				.then(function (rows) {
+
+					dealRespository.getListDealNon(req.body.dealid)
+						.then(function (rows) {
+							var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+								from: 'ADMIN',
+								to: rows[0].email1,
+								subject: 'Thông báo',
+								text: 'Bạn nhận được thông báo từ ADMIN',
+								html: 'Đã ra giá thành công <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '">' + 'http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '</a>'
+							}
+
+							transporter.sendMail(mainOptions, function (err, info) {
+								if (err) {
+									console.log(err);
+								}
+							});
+
+							var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+								from: 'ADMIN',
+								to: rows[0].email2,
+								subject: 'Thông báo',
+								text: 'Bạn nhận được thông báo từ ADMIN',
+								html: 'Đã ra giá thành công <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '">' + 'http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '</a>'
+							}
+
+							transporter.sendMail(mainOptions, function (err, info) {
+								if (err) {
+									console.log(err);
+								}
+							});
+
+							res.json(rows);
+						})
+						.catch(function (err) {
+							console.log(err);
+							res.statusCode = 500;
+							res.end('View error log on console');
+						});
+				})
+				.catch(function (err) {
+					console.log(err);
+					res.statusCode = 500;
+					res.end('View error log on console');
+				});
 		})
 		.catch(function (err) {
 			console.log(err);
@@ -283,15 +353,50 @@ router.post('/insertuserban', function (req, res) {
 	var arrDeal = new Array();
 	arrDeal.push(req.body.userid);
 	arrDeal.push(req.body.dealid);
-	dealRespository.insertDealBan(arrDeal)
+
+	var transporter = nodemailer.createTransport({ // config mail server
+		service: 'Gmail',
+		auth: {
+			user: 'dapxekhongyen@gmail.com',
+			pass: '01694424958'
+		}
+	});
+
+	var arr = new Array();
+	arr.push(req.body.userid);
+	userRespository.getUser(arr)
 		.then(function (rows) {
-			res.json(rows);
+
+			var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+				from: 'ADMIN',
+				to: rows[0].email,
+				subject: 'Thông báo',
+				text: 'Bạn nhận được thông báo từ ADMIN',
+				html: 'Bạn đã bị kich <a href="http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '">' + 'http://localhost:8080/client/views/dealdetail.html?dealid=' + req.body.dealid + '</a>'
+			}
+			
+			transporter.sendMail(mainOptions, function (err, info) {
+				if (err) {
+					console.log(err);
+				}
+			});
+
+			dealRespository.insertDealBan(arrDeal)
+				.then(function (rows) {
+					res.json(rows);
+				})
+				.catch(function (err) {
+					console.log(err);
+					res.statusCode = 500;
+					res.end('View error log on console');
+				});
 		})
 		.catch(function (err) {
 			console.log(err);
 			res.statusCode = 500;
 			res.end('View error log on console');
 		});
+
 });
 
 
@@ -325,6 +430,20 @@ router.post('/searchall', function (req, res) {
 		});
 });
 
+router.post('/searchallasc', function (req, res) {
+	var arrDeal = new Array();
+	arrDeal.push(req.body.line);
+	dealRespository.searchAllasc(arrDeal)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 router.post('/searchcate', function (req, res) {
 	var arrDeal = new Array();
 	arrDeal.push(req.body.cateid);
@@ -340,11 +459,41 @@ router.post('/searchcate', function (req, res) {
 		});
 });
 
+router.post('/searchcateasc', function (req, res) {
+	var arrDeal = new Array();
+	arrDeal.push(req.body.cateid);
+	arrDeal.push(req.body.line);
+	dealRespository.searchCateasc(arrDeal)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
 router.post('/searchstring', function (req, res) {
 	var arrDeal = new Array();
 	arrDeal.push(req.body.str);
 	arrDeal.push(req.body.line);
 	dealRespository.searchString(arrDeal)
+		.then(function (rows) {
+			res.json(rows);
+		})
+		.catch(function (err) {
+			console.log(err);
+			res.statusCode = 500;
+			res.end('View error log on console');
+		});
+});
+
+router.post('/searchstringasc', function (req, res) {
+	var arrDeal = new Array();
+	arrDeal.push(req.body.str);
+	arrDeal.push(req.body.line);
+	dealRespository.searchStringasc(arrDeal)
 		.then(function (rows) {
 			res.json(rows);
 		})

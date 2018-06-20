@@ -67,12 +67,13 @@ module.exports = {
 			'sp.link_img1 ' +
 			'from daugia dg, sanpham sp ' +
 			'where dg.masanpham = sp.masanpham and dg.thoigianketthuc > now()' +
-			'order by thoigianketthuc asc limit 5';
+			'order by thoigianketthuc desc limit 5';
 		return db.load(sql);
 	},
 
 	getDealPrice: function (arr) {
-		var sql = 'select madaugia, giacaonhat from daugia where madaugia = ?';
+		var sql = 'select dg.madaugia, dg.manguoidaugiacaonhat, nd.email, dg.giacaonhat from daugia dg, nguoidung nd '
+				+ 'where dg.manguoidaugiacaonhat = nd.manguoidung and madaugia = ?';
 		return db.loadDetail(sql, arr);
 	},
 
@@ -134,7 +135,17 @@ module.exports = {
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
 			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
 			'sp.link_img1 ' +
-			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc order by dg.thoigianketthuc desc ' +
+			'limit ? , 12';
+		return db.loadDetail(sql, arr);
+	},
+
+	searchAllasc: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc order by dg.thoigianketthuc asc ' +
 			'limit ? , 12';
 		return db.loadDetail(sql, arr);
 	},
@@ -146,6 +157,16 @@ module.exports = {
 			'sp.link_img1 ' +
 			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham ' +
 			'and sp.madanhmuc = ? and now() < dg.thoigianketthuc limit ? , 12';
+		return db.loadDetail(sql, arr);
+	},
+	
+	searchCateasc: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham ' +
+			'and sp.madanhmuc = ? and now() < dg.thoigianketthuc order by dg.thoigianketthuc asc limit ? , 12';
 		return db.loadDetail(sql, arr);
 	},
 
@@ -160,11 +181,22 @@ module.exports = {
 		return db.load(sql);
 	},
 
+	searchStringasc: function (arr) {
+		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
+			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
+			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc, ' +
+			'sp.link_img1 ' +
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and ' +
+			'sp.tensanpham LIKE \'%' + arr[0] + '%\' and now() < dg.thoigianketthuc order by dg.thoigianketthuc asc limit ' + arr[1] + ' , 12';
+		console.log(sql);
+		return db.load(sql);
+	},
+
 	searchAllPage: function (arr) {
 		var sql = 'select dg.madaugia , dg.giacaonhat, sp.tensanpham, ' +
 			'convert_tz(dg.thoigiandang,\'+00:00\',\'+07:00\') as thoigiandang, ' +
 			'convert_tz(dg.thoigianketthuc,\'+00:00\',\'+07:00\') as thoigianketthuc ' +
-			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc ';
+			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and now() < dg.thoigianketthuc';
 		return db.loadDetail(sql, arr);
 	},
 
@@ -196,4 +228,18 @@ module.exports = {
 		var sql = 'update daugia set damua = 0 where madaugia = ' + arr[2];
 		return db.updatenon(sql);
 	},
+
+	getListDealTime: function(time) {
+		var sql = 'select dg.madaugia, sp.tensanpham, dg.manguoidaugiacaonhat, dg.manguoiban, nd1.email as email1, nd2.email as email2 '
+				+ 'from daugia dg, nguoidung nd1, nguoidung nd2, sanpham sp '
+				+ 'where dg.manguoiban = nd1.manguoidung and dg.manguoidaugiacaonhat = nd2.manguoidung and dg.masanpham = sp.masanpham and dg.thoigianketthuc = \'' + time + '\'';
+		return db.load(sql);
+	},
+
+	getListDealNon: function(ma) {
+		var sql = 'select dg.madaugia, sp.tensanpham, dg.manguoidaugiacaonhat, dg.manguoiban, nd1.email as email1, nd2.email as email2 '
+				+ 'from daugia dg, nguoidung nd1, nguoidung nd2, sanpham sp '
+				+ 'where dg.manguoiban = nd1.manguoidung and dg.manguoidaugiacaonhat = nd2.manguoidung and dg.masanpham = sp.masanpham and dg.madaugia = ' + ma;
+		return db.load(sql);
+	}
 }
