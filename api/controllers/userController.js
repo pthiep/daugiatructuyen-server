@@ -1,6 +1,7 @@
 var userRespository = require('../repository/userRespository');
 var express = require('express');
 var router = express.Router();
+var nodemailer = require('nodemailer');
 
 // lay tat ca thong tin nguoi dung (xoa sau khi hoan tat project)
 router.get('/', function (req, res) {
@@ -482,10 +483,42 @@ router.post('/resetpass', function (req, res) {
 	var arr = new Array();
 	arr.push(req.body.pass);
 	arr.push(req.body.userid);
-	console.log(arr);
+	var transporter = nodemailer.createTransport({ // config mail server
+		service: 'Gmail',
+		auth: {
+			user: 'dapxekhongyen@gmail.com',
+			pass: '01694424958'
+		}
+	});
+
 	userRespository.resetPass(arr)
 		.then(function (rows) {
-			res.json(rows);
+			var arruser = new Array();
+			arruser.push(req.body.userid);
+			userRespository.getUser(arruser)
+				.then(function (rows) {
+					var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
+						from: 'ADMIN',
+						to: rows[0].email,
+						subject: 'Thông báo',
+						text: 'Bạn nhận được thông báo từ ADMIN',
+						html: 'Tài khoản của bạn đã được reset mất khẩu, mật khẩu là : ' + req.body.passnot
+					}
+
+					transporter.sendMail(mainOptions, function (err, info) {
+						if (err) {
+							console.log(err);
+						}
+					});
+
+					res.json(rows);
+				})
+				.catch(function (err) {
+					console.log(err);
+					res.statusCode = 500;
+					res.end('View error log on console');
+				});
+
 		})
 		.catch(function (err) {
 			console.log(err);

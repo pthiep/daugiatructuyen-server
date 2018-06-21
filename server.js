@@ -63,7 +63,7 @@ bb.extend(app, {
 	allowedPath: /./
 });
 
-// app.use(morgan("dev"));
+app.use(morgan("dev"));
 
 server.listen(port, function () {
 	console.log('Server listening on port: ' + port);

@@ -177,7 +177,6 @@ module.exports = {
 			'sp.link_img1 ' +
 			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and ' +
 			'sp.tensanpham LIKE \'%' + arr[0] + '%\' and now() < dg.thoigianketthuc limit ' + arr[1] + ' , 12';
-		console.log(sql);
 		return db.load(sql);
 	},
 
@@ -188,7 +187,6 @@ module.exports = {
 			'sp.link_img1 ' +
 			'from daugia dg, sanpham sp where dg.masanpham = sp.masanpham and ' +
 			'sp.tensanpham LIKE \'%' + arr[0] + '%\' and now() < dg.thoigianketthuc order by dg.thoigianketthuc asc limit ' + arr[1] + ' , 12';
-		console.log(sql);
 		return db.load(sql);
 	},
 
